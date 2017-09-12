@@ -4,8 +4,8 @@ import './SearchBar.css';
 
 
 class SearchBar extends React.Component {
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
         this.state={
             term:'',
             location:'',
@@ -18,10 +18,12 @@ class SearchBar extends React.Component {
         };
         
         //bind this to methods
+        // 因為handleSortByChange被呼叫時還要傳入option,所以不在這邊bind this
+        // this.handleSortByChange=this.handleSortByChange.bind(this);
         this.getSortByClass=this.getSortByClass.bind(this);
-        this.handleSortByChange=this.handleSortByChange.bind(this);
         this.handleTermChange=this.handleTermChange.bind(this);
         this.handleLocationChange=this.handleLocationChange.bind(this);
+        this.handleSearch=this.handleSearch.bind(this);
     }
 
     //取得sorting option 的class
@@ -48,12 +50,19 @@ class SearchBar extends React.Component {
         this.setState({location:e.target.value});
     }
 
+    // 處理Search
+    //把目前state資料傳入
+    handleSearch(e){
+        e.preventDefault();
+        this.props.searchYelp(this.state.term,this.state.location,this.state.sortBy);
+    }
+
     //把sort options render出來
     renderSortByOptions(sortByOptions) {
         return Object.keys(sortByOptions).map(sortByOption => {
             let sortByOptionValue = sortByOptions[sortByOption];
-            return <li  onClick={this.handleSortByChange(sortByOptionValue)}
-                        className={this.getSortByClass(sortByOptionValue)}
+            return <li  onClick={this.handleSortByChange.bind(this,sortByOptionValue)} 
+                        className={this.getSortByClass(sortByOptionValue)} 
                         key={sortByOptionValue}>{sortByOption}</li>
         });
     }
@@ -76,7 +85,7 @@ class SearchBar extends React.Component {
                     <input onChange={this.handleLocationChange} placeholder="Where?" />
                 </div>
                 <div className="SearchBar-submit">
-                    <a>Let's Go</a>
+                    <a onClick={this.handleSearch}>Let's Go</a>
                 </div>
             </div>
         )
